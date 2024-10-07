@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>更新學生出席狀態</title>
+</head>
+<body>
+    <h2>更新讀經狀態</h2>
+    <form id="attendanceForm">
+        <label for="studentId">輸入學號:</label>
+        <input type="text" id="studentId" name="studentId" required>
+        <br>
+        <label for="studentName">或輸入姓名:</label>
+        <input type="text" id="studentName" name="studentName">
+        <br>
+        <label for="week">選擇週次:</label>
+        <select id="week"></select>  <!-- 選項會自動生成 -->
+        <br>
+        <label for="status">選擇狀態:</label>
+        <select id="status">
+            <option value="true">True</option>
+            <option value="false">False</option>
+        </select>
+        <br><br>
+        <button type="submit">提交</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        // 自動生成 W1 到 W27 的選項
+        const weekSelect = document.getElementById('week');
+        for (let i = 1; i <= 27; i++) {
+            const option = document.createElement('option');
+            option.value = 'W' + i;
+            option.text = 'W' + i;
+            weekSelect.appendChild(option);
+        }
+
+      document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+    e.preventDefault();  // 防止頁面刷新
+
+    // 獲取使用者輸入
+    const studentId = document.getElementById('studentId').value;
+    const studentName = document.getElementById('studentName').value;
+    const week = document.getElementById('week').value;
+    const status = document.getElementById('status').value;
+
+    // 呼叫 Google Apps Script 函式更新出席狀態並獲取已更新週次和完成率
+    google.script.run.withSuccessHandler(function(response) {
+        document.getElementById('result').innerText = response;  // 顯示結果
+    }).updateStudentAttendance(studentId, studentName, week, status);
+});
+
+
+    </script>
+</body>
+</html>
