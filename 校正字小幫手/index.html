@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            background-color: #456da8;
+            height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            font-size: 1.5em;
+            font-weight: bold;
+            line-height: 40px;
+            /* 垂直居中 */
+        }
+
+        .content {
+            background-color: #dfb88d;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .Mark {
+            color: #f5532c;
+            background-color: #f897a8;
+        }
+
+        .button {
+            background-color: #f4a234;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .button:hover {
+            background-color: #f5532c;
+        }
+
+        textarea {
+            width: 100%;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            padding: 10px;
+            resize: vertical;
+        }
+
+        table {
+            margin: 20px 0;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td {
+            padding: 10px;
+            border: 2px solid #ccc;
+            background-color: #ffffff;
+        }
+
+        strong {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <table align="center">
+        <tr>
+            <td bgcolor="#0066CC" height="40">
+                <font color="#000000" size="+2">
+                    <strong>
+                        <center>【書房專用字訂正小幫手】</center>
+                    </strong>
+                </font>
+            </td>
+        </tr>
+        <tr>
+            <td bgcolor="#CCCCCC">
+                <ul>
+                    <li><strong>此工具不能完全取代校稿工作</strong>，替換的字要再作確認。</li>
+                    <li>內容需自行確認是否符合以下所有原則：
+                        <ul>
+                            <li>詩歌出處，如：大本103首須改成詩歌第一百○三首。</li>
+                            <li>稿中的日期，如：二00九須改成二○○九，3/4請寫成三月四日。</li>
+                            <li>雙引號『』在外，單引號在內「」。</li>
+                            <li>經文出處格式：經文之後，如：（約壹五12）；經文之前，如：約翰壹書五章十二節。</li>
+                            <li>見證稿後的投稿人（2007秋季班 林姊妹）中間空格是半形，也就是空白鍵一格。</li>
+                            <li>書房在用到『說』的時候，後面會接逗號，而不是常見的冒號（如：經上說，『…』）。但若沒有『說』字，仍然會有冒號加雙引號的組合出現（如：神所傳福音的第一句話乃是：『你在那裏？』）。</li>
+                        </ul>
+                    </li>
+                </ul>
+            </td>
+        </tr>
+    </table>
+
+    <br>
+
+    <textarea id="inputText" rows="10" cols="50">請在此輸入文字...</textarea><br><br>
+    <button onclick="processInput()">處理文字</button>
+
+    <br><br>
+    <strong>------------------------原始檔-------------------------------</strong>
+    <br>
+    <div id="originalText">
+        <table border="2">
+            <tr>
+                <td>原始內容將顯示在這裡</td>
+            </tr>
+        </table>
+    </div>
+    <br>--------------------------------------------------------------
+    <div id="replacementCount">替換次數將顯示在這裡</div>
+    <br><br>
+    <strong>----------------------置換的結果與標記--------------------</strong>
+    <br>
+    <div id="resultText">
+        <table border="2">
+            <tr>
+                <td>結果內容將顯示在這裡</td>
+            </tr>
+        </table>
+    </div>
+    <br>--------------------------------------------------------------
+    <br><br>
+
+    <strong>----------------------文字方塊裡的完成檔---------------------------</strong>
+    <br>
+    <form id="replaceForm">
+        <table>
+            <tr align="left">
+                <td valign="top">
+                    <textarea name="Content" cols="50" rows="20" id="desc"></textarea>
+                    <br>
+                </td>
+                <table border="1">
+                    <tbody>
+                        <tr>
+                            <td align="center" colspan="6">【已知校正字集】</td>
+                        </tr>
+                        <tr>
+                            <td align="center">1</td>
+                            <td align="center">[著]→[着]</td>
+                            <td align="center">2</td>
+                            <td align="center">[裡]→[裏]</td>
+                            <td align="center">3</td>
+                            <td align="center">[夠]→[彀]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">4</td>
+                            <td align="center">[嗎]→[麼]</td>
+                            <td align="center">5</td>
+                            <td align="center">[才]→[纔]</td>
+                            <td align="center">6</td>
+                            <td align="center">[做]→[作]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">7</td>
+                            <td align="center">[軟]→[輭]</td>
+                            <td align="center">8</td>
+                            <td align="center">[吧]→[罷]</td>
+                            <td align="center">9</td>
+                            <td align="center">[預]→[豫]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">10</td>
+                            <td align="center">[吃]→[喫]</td>
+                            <td align="center">11</td>
+                            <td align="center">[啊]→[阿]</td>
+                            <td align="center">12</td>
+                            <td align="center">[份]→[分]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">13</td>
+                            <td align="center">[什]→[甚]</td>
+                            <td align="center">14</td>
+                            <td align="center">[餵]→[餧]</td>
+                            <td align="center">15</td>
+                            <td align="center">[群]→[羣]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">16</td>
+                            <td align="center">[既]→[旣]</td>
+                            <td align="center">17</td>
+                            <td align="center">[即]→[卽]</td>
+                            <td align="center">18</td>
+                            <td align="center">[針]→[鍼]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">19</td>
+                            <td align="center">[略]→[畧]</td>
+                            <td align="center">20</td>
+                            <td align="center">[秘]→[祕]</td>
+                            <td align="center">21</td>
+                            <td align="center">[祢]→[你]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">22</td>
+                            <td align="center">[鬥]→[鬬]</td>
+                            <td align="center">23</td>
+                            <td align="center">[唇]→[脣]</td>
+                            <td align="center">24</td>
+                            <td align="center">[其它]→[其他]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">25</td>
+                            <td align="center">[掛慮]→[罣慮]</td>
+                            <td align="center">26</td>
+                            <td align="center">[翻譯]→[繙譯]</td>
+                            <td align="center">27</td>
+                            <td align="center">[耽延]→[躭延]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">28</td>
+                            <td align="center">[遍地]→[徧地]</td>
+                            <td align="center">29</td>
+                            <td align="center">[提醒]→[題醒]</td>
+                            <td align="center">30</td>
+                            <td align="center">[顫抖]→[戰抖]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">31</td>
+                            <td align="center">[合適]→[合式]</td>
+                            <td align="center">32</td>
+                            <td align="center">[連結]→[聯結]</td>
+                            <td align="center">33</td>
+                            <td align="center">[連絡]→[聯絡]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">34</td>
+                            <td align="center">[撒旦]→[撒但]</td>
+                            <td align="center">35</td>
+                            <td align="center">[憤怒]→[忿怒]</td>
+                            <td align="center">36</td>
+                            <td align="center">[紀念]→[記念]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">37</td>
+                            <td align="center">[模仿]→[模倣]</td>
+                            <td align="center">38</td>
+                            <td align="center">[樹幹]→[樹榦]</td>
+                            <td align="center">39</td>
+                            <td align="center">[消滅]→[銷滅]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">40</td>
+                            <td align="center">[折被子]→[摺被子]</td>
+                            <td align="center">41</td>
+                            <td align="center">[哈利路亞]→[阿利路亞]</td>
+                            <td align="center">42</td>
+                            <td align="center">[警醒]→[儆醒]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">43</td>
+                            <td align="center">[異像]→[異象]</td>
+                            <td align="center">44</td>
+                            <td align="center">[託負]→[託付]</td>
+                            <td align="center">45</td>
+                            <td align="center">[服侍]→[服事]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">46</td>
+                            <td align="center">[,]→[，]</td>
+                            <td align="center">47</td>
+                            <td align="center">[.]→[。]</td>
+                            <td align="center">48</td>
+                            <td align="center">[:]→[：]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">49</td>
+                            <td align="center">[;]→[；]</td>
+                            <td align="center">50</td>
+                            <td align="center">[-]→[－]</td>
+                            <td align="center">51</td>
+                            <td align="center">[~]→[～]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">52</td>
+                            <td align="center">[!]→[！]</td>
+                            <td align="center">53</td>
+                            <td align="center">[?]→[？]</td>
+                            <td align="center">54</td>
+                            <td align="center">[｢]→[『]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">55</td>
+                            <td align="center">[｣]→[』]</td>
+                            <td align="center">56</td>
+                            <td align="center">[「]→[『]</td>
+                            <td align="center">57</td>
+                            <td align="center">[」]→[』]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">58</td>
+                            <td align="center">[(]→[（]</td>
+                            <td align="center">59</td>
+                            <td align="center">[)]→[）]</td>
+                            <td align="center">60</td>
+                            <td align="center">[“]→[『]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">61</td>
+                            <td align="center">[”]→[』]</td>
+                            <td align="center">62</td>
+                            <td align="center">[〝]→[『]</td>
+                            <td align="center">63</td>
+                            <td align="center">[〞]→[』]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">64</td>
+                            <td align="center">[說：『]→[說，『]</td>
+                            <td align="center">65</td>
+                            <td align="center">[輭體]→[軟體]</td>
+                            <td align="center">66</td>
+                            <td align="center">[鍼對]→[針對]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">67</td>
+                            <td align="center">[麼哪]→[嗎哪]</td>
+                            <td align="center">68</td>
+                            <td align="center">[豫士]→[預士]</td>
+                            <td align="center">69</td>
+                            <td align="center">[豫官]→[預官]</td>
+                        </tr>
+                        <tr>
+                            <td align="center">70</td>
+                            <td align="center">[着者]→[著者]</td>
+                            <td align="center">71</td>
+                            <td align="center">[着時：]→[著時：]</td>
+                            <td align="center">72</td>
+                            <td align="center">[着地：]→[著地：]</td>
+                        </tr>
+                        <tr>
+                            <td align="center" colspan="6"><strong>若有缺漏的字集請繼續回報補上，感謝主！</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </tr>
+        </table>
+    </form>
+    <script>
+        // 處理輸入的文字
+        function processInput() {
+            const inputText = document.getElementById('inputText').value;
+            const result = processText(inputText); // 調用 processText 函數處理文字
+            updateOutput(result);
+        }
+
+        // 更新輸出的原始文字和結果文字
+        function updateOutput(result) {
+            document.getElementById('originalText').innerHTML = result.originalText;
+            document.getElementById('resultText').innerHTML = result.markedText;
+            document.getElementById('replacementCount').innerHTML = result.replacementDetails.join('，') + `－共取代了${result.totalReplacementCount}個字`;
+            document.getElementById('desc').value = result.finalText;
+        }
+
+        // 處理文字替換邏輯
+        function processText(content) {
+            const wordReplacements = {
+    '著': '着',
+    '裡': '裏',
+    '夠': '彀',
+    '嗎': '麼',
+    '才': '纔',
+    '做': '作',
+    '軟': '輭',
+    '吧': '罷',
+    '預': '豫',
+    '吃': '喫',
+    '啊': '阿',
+    '份': '分',
+    '什': '甚',
+    '餵': '餧',
+    '群': '羣',
+    '既': '旣',
+    '即': '卽',
+    '針': '鍼',
+    '略': '畧',
+    '秘': '祕',
+    '祢': '你',
+    '鬥': '鬬',
+    '唇': '脣',
+    '其它': '其他',
+    '掛慮': '罣慮',
+    '翻譯': '繙譯',
+    '耽延': '躭延',
+    '遍地': '徧地',
+    '提醒': '題醒',
+    '顫抖': '戰抖',
+    '合適': '合式',
+    '連結': '聯結',
+    '連絡': '聯絡',
+    '撒旦': '撒但',
+    '憤怒': '忿怒',
+    '紀念': '記念',
+    '模仿': '模倣',
+    '樹幹': '樹榦',
+    '消滅': '銷滅',
+    '折被子': '摺被子',
+    '哈利路亞': '阿利路亞',
+    '警醒': '儆醒',
+    '異像': '異象',
+    '託負': '託付',
+    '服侍': '服事',
+    ',': '，',
+    '\\.': '。',
+    ':': '：',
+    ';': '；',
+    '-': '－',
+    '~': '～',
+    '!': '！',
+    '\\?': '？',
+    '｢': '『',
+    '｣': '』',
+    '\\(': '（',
+    '\\)': '）',
+    '“': '『',      
+        '「': '『',
+    '”': '』',
+        '」': '』',
+    '〝': '『',
+    '〞': '』',
+    '說：『': '說，『',
+    '輭體': '軟體',
+    '鍼對': '針對',
+    '麼哪': '嗎哪',
+    '豫士': '預士',
+    '豫官': '預官',
+    '着者': '著者',
+    '着時：': '著時：',
+    '着地：': '著地：'
+};
+
+
+            // Initialize tracking
+            let newText = content;
+            let totalReplacementCount = 0;
+            let replacementDetails = {};
+
+            // Apply word replacements
+            for (const [key, value] of Object.entries(wordReplacements)) {
+                const regex = new RegExp(key, 'g');
+                const matchCount = (newText.match(regex) || []).length;
+                if (matchCount > 0) {
+                    newText = newText.replace(regex, `<span class="Mark">${value}</span>`);
+                    replacementDetails[key] = {
+                        replacedWith: value,
+                        count: matchCount
+                    };
+                    totalReplacementCount += matchCount;
+                }
+            }
+
+            // Construct details string
+            const detailsArray = Object.entries(replacementDetails).map(([key, {
+                replacedWith,
+                count
+            }]) => {
+                return `[${key}]→[${replacedWith}]（${count}個字）`;
+            });
+
+            let originalText = `<table border="2"><tr><td>${content}</td></tr></table>`;
+            let finalText = newText.replace(/<[^>]+>/g, ''); // Removing the span tags for the final result
+
+            return {
+                originalText: originalText,
+                markedText: `<table border="2"><tr><td>${newText}</td></tr></table>`,
+                totalReplacementCount: totalReplacementCount,
+                finalText: finalText,
+                replacementDetails: detailsArray
+            };
+        }
+    </script>
+
+
+</body>
+
+</html>
