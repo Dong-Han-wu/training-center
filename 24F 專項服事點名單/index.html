@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可編輯下拉式選單表單</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* 基本重設 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 根元素的字體大小和基本顏色設置 */
+    html {
+      font-size: 16px; /* 基準字體大小 */
+      font-family: Arial, sans-serif;
+      color: #16423c;
+    }
+
+    /* 全局樣式 */
+    body {
+      background-color: #e9efec;
+      color: #16423c;
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 主容器 */
+    .container {
+      width: 80vw;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2vh 2vw;
+      background-color: #c4dad2;
+      border-radius: 10px;
+    }
+
+    /* 標題樣式 */
+    h1, h2, h3 {
+      color: #6a9c89;
+    }
+
+    /* 按鈕樣式 */
+    button {
+      background-color: #16423c;
+      color: #e9efec;
+      border: none;
+      padding: 1vh 2vw;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #6a9c89;
+    }
+
+    /* 表單樣式 */
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 0.5vh;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      padding: 1vh 2vw;
+      margin-bottom: 1vh;
+      border: 1px solid #16423c;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    /* 表格樣式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2vh 0;
+    }
+
+    th, td {
+      padding: 1vh 2vw;
+      text-align: left;
+      border-bottom: 1px solid #16423c;
+    }
+
+    th {
+      background-color: #6a9c89;
+      color: #e9efec;
+    }
+
+    td {
+      background-color: #c4dad2;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .container {
+        width: 90vw;
+        padding: 3vh 3vw;
+      }
+      
+      button {
+        padding: 1.5vh 3vw;
+      }
+
+      input, select, textarea {
+        font-size: 0.9rem;
+        padding: 1vh 2vw;
+      }
+      
+      th, td {
+        padding: 1vh 1vw;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: 95vw;
+        padding: 4vh 4vw;
+      }
+
+      button {
+        padding: 2vh 4vw;
+        font-size: 1rem;
+      }
+
+      input, select, textarea {
+        font-size: 0.8rem;
+        padding: 1.5vh 2.5vw;
+      }
+
+      th, td {
+        padding: 1.5vh 1.5vw;
+      }
+    }
+  </style>
+</head>
+<body class="p-4">
+  <div class="container">
+    <h2 id="spreadsheetName">Loading...</h2>
+
+    <h2>出席記錄表</h2>
+
+    <div class="mb-3">
+      <label for="group" class="form-label">選擇群組:</label>
+      <select id="group" class="form-select" onchange="updateAttendeeList()">
+<option value="接待組">接待組</option>
+<option value="運動保健組">運動保健組</option>
+<option value="修繕組">修繕組</option>
+<option value="統計組">統計組</option>
+<option value="講義組">講義組</option>
+<option value="美地文字組">美地文字組</option>
+<option value="課務圖書組">課務圖書組</option>
+<option value="美工組">美工組</option>
+<option value="司琴茶水組">司琴茶水組</option>
+<option value="醫務組">醫務組</option>
+<option value="電腦網路組">電腦網路組</option>
+<option value="電氣組">電氣組</option>
+<option value="環境園藝組">環境園藝組</option>
+<option value="行政組">行政組</option>
+<option value="呼召牧養組">呼召牧養組</option>
+<option value="開展組">開展組</option>
+<option value="畢業詩歌組">畢業詩歌組</option>
+<option value="畢業見證組">畢業見證組</option>
+
+      </select>
+    </div>
+
+    <!-- Spinner 動畫 -->
+    <div id="spinner" class="text-center my-3" style="display: none;">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="date" class="form-label">日期:</label>
+      <input type="date" id="date" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label for="time" class="form-label">時間:</label>
+      <input type="time" id="time" class="form-control">
+    </div>
+
+    <h3>點名清單</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>參與者</th>
+          <th>狀態</th>
+        </tr>
+      </thead>
+      <tbody id="attendeeTable">
+        <!-- 這裡將由 JavaScript 動態生成表格內容 -->
+      </tbody>
+    </table>
+
+    <button class="btn btn-primary" onclick="submitData()">提交</button>
+
+    <div id="output" class="mt-3"></div>
+
+    <h2 class="mt-5">點名紀錄</h2>
+    <div id="records"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  
+  <script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateAttendeeList();
+    loadAttendanceRecords(); // 添加這行來在頁面載入後自動執行 loadAttendanceRecords()
+
+    // 获取并显示工作簿名称
+    google.script.run.withSuccessHandler(function(name) {
+        document.getElementById('spreadsheetName').innerText = name;
+    }).getSpreadsheetName();
+});
+
+   function populateAttendeeTable(attendees) {
+  const tableBody = document.getElementById('attendeeTable');
+  tableBody.innerHTML = ''; // 清空之前的內容
+
+  attendees.forEach((attendee, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>
+        ${attendee} <!-- 直接顯示參與者名字，而不是下拉選單 -->
+      </td>
+      <td>
+        <div class="input-group">
+          <input type="text" id="attendeeStatus${index + 1}" class="form-control" value="O"> <!-- 默認顯示O -->
+          <div class="input-group-append">
+            <select id="status${index + 1}" class="form-select" onchange="updateInputValue(${index + 1})">
+             <option value="O">O</option>
+            <option value="/N">/N</option>
+            <option value="FTAn">FTAn</option>
+            <option value="FTAn/O">FTAn/O</option>
+            <option value="M3/O">M3/O</option>
+            <option value="M3/N">M3/N</option>
+            <option value="M3TA3/O">M3TA3/O</option>
+            <option value="M3TA3/N">M3TA3/N</option>
+            <option value="M3TA4/O">M3TA4/O</option>
+            <option value="M3TA4/N">M3TA4/N</option>
+            <option value="FT/FT/O">FT/FT/O</option>
+            <option value="#7">#7</option>
+            <option value="假">假</option>
+            <option value="假/O">假/O</option>
+            <option value="ILL">ILL</option>
+
+            </select>
+          </div>
+        </div>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+function updateInputValue(index) {
+  const statusSelect = document.getElementById(`status${index}`);
+  const inputField = document.getElementById(`attendeeStatus${index}`);
+  inputField.value = statusSelect.value; // 將選擇的值更新到輸入框中
+}
+
+    function updateAttendeeList() {
+      const group = document.getElementById('group').value;
+      
+      // 顯示 spinner
+      document.getElementById('spinner').style.display = 'block';
+
+      google.script.run.withSuccessHandler(function(attendees) {
+        populateAttendeeTable(attendees);
+
+        // 隱藏 spinner
+        document.getElementById('spinner').style.display = 'none';
+      }).getAttendeesByGroup(group);
+      loadAttendanceRecords()
+    }
+
+    
+   function submitData() {
+  const group = document.getElementById('group').value;
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  const attendees = [];
+  const tableBody = document.getElementById('attendeeTable');
+
+  Array.from(tableBody.rows).forEach((row, index) => {
+    const attendee = row.cells[0].innerText;
+    const status = document.getElementById(`attendeeStatus${index + 1}`).value; // Get value from form-control
+    if (attendee) {
+      attendees.push({ attendee, status });
+    }
+  });
+
+  // Submit data and show success message
+  google.script.run.withSuccessHandler(function() {
+    document.getElementById('output').innerText = '數據已提交';
+
+    // Wait for 3 seconds before reloading attendance records
+    setTimeout(function() {
+      loadAttendanceRecords();
+    }, 3000); // 3000 milliseconds = 3 seconds
+  }).updateOrAppendMultipleRows(group, name, date, time, attendees);
+  
+  // Optionally, update the attendee list again if needed
+  updateAttendeeList();
+}
+function loadAttendanceRecords() {
+  const group = document.getElementById('group').value;
+
+  google.script.run.withSuccessHandler(function(records) {
+    const recordsDiv = document.getElementById('records');
+    recordsDiv.innerHTML = ''; // Clear previous content
+
+    if (records && records.length > 0) {
+      const table = document.createElement('table');
+      table.className = 'table table-bordered';
+
+      const tbody = document.createElement('tbody');
+      records.forEach(row => {
+        if (row.some(cell => cell)) { // Only append rows with data
+          const tr = document.createElement('tr');
+          row.forEach(cell => {
+            const td = document.createElement('td');
+            td.innerText = cell || ''; // Maintain empty cells
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      });
+
+      if (tbody.children.length > 0) { // Append table only if there are rows
+        table.appendChild(tbody);
+        recordsDiv.appendChild(table);
+      } else {
+        recordsDiv.innerText = '沒有找到紀錄。';
+      }
+    } else {
+      recordsDiv.innerText = '沒有找到紀錄。';
+    }
+  }).getAttendanceRecords(group); // Ensure this matches your backend function
+}
+
+
+
+    // 初始化時更新參與者列表
+    document.addEventListener('DOMContentLoaded', updateAttendeeList);
+  </script>
+</body>
+</html>
