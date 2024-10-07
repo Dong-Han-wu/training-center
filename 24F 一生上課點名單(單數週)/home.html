@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>可編輯下拉式選單表單</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* 基本重設 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* 根元素的字體大小和基本顏色設置 */
+    html {
+      font-size: 16px; /* 基準字體大小 */
+      font-family: Arial, sans-serif;
+      color: #16423c;
+    }
+        a {
+            color: inherit; /* 保持繼承的文字顏色 */
+            text-decoration: none; /* 移除下劃線 */
+        }
+
+        a:hover {
+            color: inherit; /* 保持原色 */
+            text-decoration: underline; /* 滑鼠懸停時顯示下劃線 */
+        }
+    /* 全局樣式 */
+    body {
+      background-color: #e9efec;
+      color: #16423c;
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 主容器 */
+    .container {
+      width: 80vw;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2vh 2vw;
+      background-color: #c4dad2;
+      border-radius: 10px;
+    }
+
+    /* 標題樣式 */
+    h1, h2, h3 {
+      color: #6a9c89;
+    }
+
+    /* 按鈕樣式 */
+    button {
+      background-color: #16423c;
+      color: #e9efec;
+      border: none;
+      padding: 1vh 2vw;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #6a9c89;
+    }
+
+    /* 表單樣式 */
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 0.5vh;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      padding: 1vh 2vw;
+      margin-bottom: 1vh;
+      border: 1px solid #16423c;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    /* 表格樣式 */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 2vh 0;
+    }
+
+    th, td {
+      padding: 1vh 2vw;
+      text-align: left;
+      border-bottom: 1px solid #16423c;
+    }
+
+    th {
+      background-color: #6a9c89;
+      color: #e9efec;
+    }
+
+    td {
+      background-color: #c4dad2;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 768px) {
+      .container {
+        width: 90vw;
+        padding: 3vh 3vw;
+      }
+      
+      button {
+        padding: 1.5vh 3vw;
+      }
+
+      input, select, textarea {
+        font-size: 0.9rem;
+        padding: 1vh 2vw;
+      }
+      
+      th, td {
+        padding: 1vh 1vw;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        width: 95vw;
+        padding: 4vh 4vw;
+      }
+
+      button {
+        padding: 2vh 4vw;
+        font-size: 1rem;
+      }
+
+      input, select, textarea {
+        font-size: 0.8rem;
+        padding: 1.5vh 2.5vw;
+      }
+
+      th, td {
+        padding: 1.5vh 1.5vw;
+      }
+    }
+  </style>
+</head>
+<body class="p-4">
+  <h1><ul>
+      <? var count = urls.length; ?>
+      <? for(var i = 0; i < count; i ++) { ?>
+        <li><a href='<?= urls[i] ?>'>修改出席紀錄 </a></li>
+      <? } ?>
+    </ul>
+    </h1>
+  <div class="container">
+    
+    <h2>出席記錄表</h2>
+    <h2 id="spreadsheetName">Loading...</h2>
+
+    <div class="mb-3">
+    <label for="group" class="form-label">選擇週一到主日:</label>
+    <select id="group" class="form-select" onchange="updateAttendeeList()">
+      <option value="週一">週一</option>
+      <option value="週二">週二</option>
+      <option value="週三">週三</option>
+      <option value="週四">週四</option>
+      <option value="週五">週五</option>
+      <option value="週六">週六</option>
+      <option value="主日">主日</option>
+    </select>
+
+
+    <!-- Spinner 動畫 -->
+    <div id="spinner" class="text-center my-3" style="display: none;">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="name" class="form-label">點名者:</label>
+      <input type="text" id="name" class="form-control" placeholder="Enter Name">
+    </div>
+
+    <div class="mb-3">
+      <label for="date" class="form-label">日期:</label>
+      <input type="date" id="date" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label for="time" class="form-label">時間:</label>
+      <input type="time" id="time" class="form-control">
+    </div>
+
+    <h3>點名清單</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>參與者</th>
+          <th>狀態</th>
+        </tr>
+      </thead>
+      <tbody id="attendeeTable">
+        <!-- 這裡將由 JavaScript 動態生成表格內容 -->
+      </tbody>
+    </table>
+
+    <button class="btn btn-primary" onclick="submitData()">提交</button>
+
+    <div id="output" class="mt-3"></div>
+
+    <h2 class="mt-5">點名紀錄</h2>
+    <div id="records"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+  
+  <script>
+    
+     document.addEventListener('DOMContentLoaded', function() {
+    const groupSelect = document.getElementById('group');
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 取得今天是星期幾 (0: 週日, 1: 週一, ..., 6: 週六)
+
+    switch(dayOfWeek) {
+      case 0:
+        groupSelect.value = '主日';
+        break;
+      case 1:
+        groupSelect.value = '週一';
+        break;
+      case 2:
+        groupSelect.value = '週二';
+        break;
+      case 3:
+        groupSelect.value = '週三';
+        break;
+      case 4:
+        groupSelect.value = '週四';
+        break;
+      case 5:
+        groupSelect.value = '週五';
+        break;
+      case 6:
+        groupSelect.value = '週六';
+        break;
+    }
+
+    // 更新參與者列表
+    updateAttendeeList();
+  });
+    document.addEventListener('DOMContentLoaded', function() {
+    updateAttendeeList();
+    
+    // 获取并显示工作簿名称
+    google.script.run.withSuccessHandler(function(name) {
+        document.getElementById('spreadsheetName').innerText = name;
+    }).getSpreadsheetName();
+});
+
+// 定義 updateInputValue 函數，用於更新輸入框的值
+function updateInputValue(index) {
+  const selectElement = document.getElementById(`status${index}`);
+  const inputElement = document.getElementById(`attendeeStatus${index}`);
+
+  // 更新輸入框的值為選擇框中的值
+  inputElement.value = selectElement.value;
+}
+
+function populateAttendeeTable(attendees) {
+  const tableBody = document.getElementById('attendeeTable');
+  tableBody.innerHTML = ''; // 清空之前的內容
+
+  attendees.forEach((attendee, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>
+        ${attendee} <!-- 直接顯示參與者名字 -->
+      </td>
+      <td>
+        <div class="input-group">
+          <input type="text" id="attendeeStatus${index + 1}" class="form-control" value="O"> <!-- 默認顯示O -->
+          <div class="input-group-append">
+            <select id="status${index + 1}" class="form-select" onchange="updateInputValue(${index + 1})">
+            <option value="O">O</option>
+              <option value="/N">/N</option>
+              <option value="FTA1/FTA1/O">FTA1/FTA1/O</option>
+              <option value="FTA2/FTA2/O">FTA2/FTA2/O</option>
+              <option value="FTA3/FTA3/O">FTA3/FTA3/O</option>
+              <option value="FTA4/FTA4/O">FTA4/FTA4/O</option>
+              <option value="FTA5/FTA5/O">FTA5/FTA5/O</option>
+              <option value="FTA6/FTA6/O">FTA6/FTA6/O</option>
+              <option value="FTAn/N">FTAn/N</option>
+              <option value="FT/FT/O">FT/FT/O</option>
+              <option value="FT/N">FT/N</option>
+              <option value="Mn">Mn</option>
+              <option value="Mn/O">Mn/O</option>
+              <option value="Mn/N">Mn/N</option>
+              <option value="MnTA4/O">MnTA4/O</option>
+              <option value="MnTA4/N">MnTA4/N</option>
+              <option value="S">S</option>
+              <option value="S/O">S/O</option>
+              <option value="S/N">S/N</option>
+              <option value="#n">#n</option>
+              <option value="#n/O">#n/O</option>
+              <option value="#n/N">#n/N</option>
+              <option value="假/假/O">假/假/O</option>
+              <option value="假/N">假/N</option>
+              <option value="ILL">ILL</option>
+              <option value="X">X</option>
+              <option value="FL/O">FL/O</option>
+              <option value="K">K</option>
+              <option value="M1TA3/O">M1TA3/O</option>
+              <option value="M2TA3/O">M2TA3/O</option>
+              <option value="M3TA3/O">M3TA3/O</option>
+              <option value="M1/O">M1/O</option>
+              <option value="M2/O">M2/O</option>
+              <option value="M3/O">M3/O</option>
+              <option value="M1">M1</option>
+              <option value="M2">M2</option>
+              <option value="M3">M3</option>
+              <option value="#1">#1</option>
+              <option value="#2">#2</option>
+              <option value="#3">#3</option>
+              <option value="#4">#4</option>
+              <option value="#5">#5</option>
+              <option value="#6">#6</option>
+              <option value="#7">#7</option>
+              <option value="#8">#8</option>
+              <option value="#1/O">#1/O</option>
+              <option value="#2/O">#2/O</option>
+              <option value="#3/O">#3/O</option>
+              <option value="#4/O">#4/O</option>
+              <option value="#5/O">#5/O</option>
+              <option value="#6/O">#6/O</option>
+              <option value="#7/O">#7/O</option>
+              <option value="#8/O">#8/O</option>
+              <option value="S統">S統</option>
+              <option value="S文">S文</option>
+              <option value="S氣">S氣</option>
+              <option value="S修">S修</option>
+              <option value="S圖">S圖</option>
+              <option value="S琴">S琴</option>
+              <option value="S網">S網</option>
+              <option value="S書">S書</option>
+              <option value="S美">S美</option>
+              <option value="S醫">S醫</option>
+              <option value="S政">S政</option>
+              <option value="S講">S講</option>
+              <option value="S季">S季</option>
+              <option value="S開">S開</option>
+              <option value="S注">S注</option>
+              <option value="S接">S接</option>
+              <option value="S園">S園</option>
+              <option value="S環">S環</option>
+              <option value="S呼">S呼</option>
+              <option value="S畢">S畢</option>
+              <option value="S統/O">S統/O</option>
+              <option value="S文/O">S文/O</option>
+              <option value="S氣/O">S氣/O</option>
+              <option value="S修/O">S修/O</option>
+              <option value="S圖/O">S圖/O</option>
+              <option value="S琴/O">S琴/O</option>
+              <option value="S網/O">S網/O</option>
+              <option value="S書/O">S書/O</option>
+              <option value="S美/O">S美/O</option>
+              <option value="S醫/O">S醫/O</option>
+              <option value="S政/O">S政/O</option>
+              <option value="S講/O">S講/O</option>
+              <option value="S季/O">S季/O</option>
+              <option value="S開/O">S開/O</option>
+              <option value="S注/O">S注/O</option>
+              <option value="S接/O">S接/O</option>
+              <option value="S園/O">S園/O</option>
+              <option value="S環/O">S環/O</option>
+              <option value="S呼/O">S呼/O</option>
+              <option value="S畢/O">S畢/O</option>
+              <option value="M1TA3/N">M1TA3/N</option>
+              <option value="M2TA3/N">M2TA3/N</option>
+              <option value="M3TA3/N">M3TA3/N</option>
+              <option value="M1TA4/O">M1TA4/O</option>
+              <option value="M2TA4/O">M2TA4/O</option>
+              <option value="M3TA4/O">M3TA4/O</option>
+              <option value="M1TA4/N">M1TA4/N</option>
+              <option value="M2TA4/N">M2TA4/N</option>
+              <option value="M3TA4/N">M3TA4/N</option>
+            </select>
+          </div>
+        </div>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+
+
+function updateAttendeeList() {
+    const group = document.getElementById('group').value;
+    
+    // 顯示 spinner
+    document.getElementById('spinner').style.display = 'block';
+
+    google.script.run.withSuccessHandler(function(attendees) {
+        populateAttendeeTable(attendees);
+
+        // 隱藏 spinner
+        document.getElementById('spinner').style.display = 'none';
+
+        // 加載點名紀錄
+        loadAttendanceRecords(); // 確保在參與者列表更新後加載紀錄
+    }).getAttendeesByGroup(group);
+}
+
+
+      function submitData() {
+    const group = document.getElementById('group').value;
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('time').value;
+    const attendees = [];
+    const tableBody = document.getElementById('attendeeTable');
+
+    Array.from(tableBody.rows).forEach((row, index) => {
+        const attendee = row.cells[0].innerText; // 获取参与者姓名
+        const statusInput = row.querySelector(`input[id="attendeeStatus${index + 1}"]`);
+        const status = statusInput.value; // 获取输入框的值
+
+        if (attendee) {
+            attendees.push({ attendee, status });
+        }
+    });
+
+    // 确保所有必需的字段已经填写
+    if (group && name && date && time && attendees.length > 0) {
+        google.script.run.updateOrAppendMultipleRows(group, name, date, time, attendees);
+        document.getElementById('output').innerText = '数据已提交';
+    } else {
+        document.getElementById('output').innerText = '请填写所有必需的字段';
+    }
+
+    // 更新参与者列表以确保显示最新状态
+    updateAttendeeList();
+}
+
+
+
+
+
+  function loadAttendanceRecords() {
+  const group = document.getElementById('group').value;
+  google.script.run.withSuccessHandler(function(records) {
+    const recordsDiv = document.getElementById('records');
+    recordsDiv.innerHTML = ''; // 清空之前的內容
+
+    if (records && records.length > 0) {
+      const table = document.createElement('table');
+      table.className = 'table table-bordered';
+
+      // 添加表頭
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      const headers = ['姓名', '課一', '課二', '課三', '課四', '課五', '課六', '課七', '課八'];
+
+      headers.forEach(header => {
+        const th = document.createElement('th');
+        th.innerText = header;
+        headerRow.appendChild(th);
+      });
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // 表格內容
+      const tbody = document.createElement('tbody');
+      records.forEach(row => {
+        const tr = document.createElement('tr');
+        row.forEach(cell => {
+          const td = document.createElement('td');
+          td.innerText = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      recordsDiv.appendChild(table);
+    } else {
+      recordsDiv.innerText = '沒有找到紀錄。';
+    }
+  }).getAttendanceRecords(group);
+}
+
+
+
+
+    // 初始化時更新參與者列表
+    document.addEventListener('DOMContentLoaded', updateAttendeeList);
+    
+  </script>
+</body>
+</html>
