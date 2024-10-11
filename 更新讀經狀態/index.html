@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>更新學生出席狀態</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* 使用 vh 和 vw 來調整響應式布局 */
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: white;
+            padding: 5vh 3vw;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 50vw;  /* 最大寬度設為 50% 的視窗寬度 */
+            min-width: 300px; /* 最小寬度設為 300px，確保在較小裝置上不會太窄 */
+        }
+
+        h2 {
+            margin-bottom: 2vh;
+            text-align: center;
+        }
+
+        label {
+            margin-top: 1vh;
+        }
+
+        button {
+            width: 100%;
+            padding: 1vh;
+            margin-top: 3vh;
+        }
+
+        #result {
+            margin-top: 2vh;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>更新讀經狀態</h2>
+    <form id="attendanceForm">
+        <div class="mb-3">
+            <label for="studentId">輸入學號:</label>
+            <input type="text" id="studentId" name="studentId" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="studentName">或輸入姓名:</label>
+            <input type="text" id="studentName" name="studentName" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="week">選擇週次:</label>
+            <select id="week" class="form-select"></select>  <!-- 選項會自動生成 -->
+        </div>
+        <div class="mb-3">
+            <label for="status">選擇狀態:</label>
+            <select id="status" class="form-select">
+                <option value="true">True</option>
+                <option value="false">False</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">提交</button>
+    </form>
+    <div id="result"></div>
+</div>
+
+<script>
+    // 自動生成 W1 到 W27 的選項
+    const weekSelect = document.getElementById('week');
+    for (let i = 1; i <= 27; i++) {
+        const option = document.createElement('option');
+        option.value = 'W' + i;
+        option.text = 'W' + i;
+        weekSelect.appendChild(option);
+    }
+
+    document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+        e.preventDefault();  // 防止頁面刷新
+
+        // 獲取使用者輸入
+        const studentId = document.getElementById('studentId').value;
+        const studentName = document.getElementById('studentName').value;
+        const week = document.getElementById('week').value;
+        const status = document.getElementById('status').value;
+
+        // 呼叫 Google Apps Script 函式更新出席狀態並獲取已更新週次和完成率
+        google.script.run.withSuccessHandler(function(response) {
+            document.getElementById('result').innerText = response;  // 顯示結果
+        }).updateStudentAttendance(studentId, studentName, week, status);
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
