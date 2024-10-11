@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>查找資料並更新應讀篇數</title>
+    <style>
+        /* 引入台北黑體 */
+        @font-face {
+            font-family: 'TaipeiSansTC';
+            src: url('你的字體路徑/TaipeiSansTC-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'TaipeiSansTC';
+            src: url('你的字體路徑/TaipeiSansTC-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'TaipeiSansTC', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .hero {
+            background-color: #007bff;
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+            font-family: 'TaipeiSansTC', sans-serif;
+        }
+
+        .result {
+            margin-top: 2rem;
+            background-color: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'TaipeiSansTC', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1 class="display-4">查找資料並更新應讀篇數</h1>
+    <p class="lead">請選擇表單並輸入相關信息以進行搜索。</p>
+</div>
+
+<div class="container mt-5">
+    <form id="searchForm">
+        <div class="mb-3">
+            <label for="sheetName" class="form-label">選擇表單（W1 到 W20）:</label>
+            <select id="sheetName" class="form-select">
+                <option value="W1">W1</option>
+                <option value="W2">W2</option>
+                <option value="W3">W3</option>
+                <option value="W4">W4</option>
+                <option value="W5">W5</option>
+                <option value="W6">W6</option>
+                <option value="W7">W7</option>
+                <option value="W8">W8</option>
+                <option value="W9">W9</option>
+                <option value="W10">W10</option>
+                <option value="W11">W11</option>
+                <option value="W12">W12</option>
+                <option value="W13">W13</option>
+                <option value="W14">W14</option>
+                <option value="W15">W15</option>
+                <option value="W16">W16</option>
+                <option value="W17">W17</option>
+                <option value="W18">W18</option>
+                <option value="W19">W19</option>
+                <option value="W20">W20</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="searchQuery" class="form-label">輸入序號、生活號、學號或姓名:</label>
+            <input type="text" id="searchQuery" class="form-control" required>
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="searchRecords()">搜索並更新</button>
+    </form>
+
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+    function searchRecords() {
+        // 獲取選擇的工作表名稱和輸入的搜索條件
+        var sheetName = document.getElementById("sheetName").value;
+        var searchQuery = document.getElementById("searchQuery").value;
+
+        // 調用 Google Apps Script 後端的 searchRecords 函數
+        google.script.run.withSuccessHandler(displayResult).searchRecords(sheetName, searchQuery);
+    }
+
+    function displayResult(response) {
+        var resultDiv = document.getElementById('result');
+
+        // 如果搜索結果為空，顯示未找到
+        if (response.result.length === 0) {
+            resultDiv.innerHTML = "<div class='alert alert-warning' role='alert'>沒有找到對應的記錄!</div>";
+        } else {
+            // 顯示找到的記錄和應讀篇數
+            var resultHTML = "<h4>找到的結果:</h4>" + response.result.join(", ") + 
+                             "<br><h4>應讀篇數已更新:</h4>" + response.expectedReadings.join(", ");
+            resultDiv.innerHTML = resultHTML;
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
