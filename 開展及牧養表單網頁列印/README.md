@@ -44,3 +44,4 @@
 - **範圍和合併儲存格**：如果在執行時出現範圍錯誤，檢查試算表的行數和列數是否與程式碼中的設定匹配。
 - **使用者屬性**：程式碼中使用了 `PropertiesService.getUserProperties`，這可能需要額外的權限。
 
+![image](picture or gif url)
